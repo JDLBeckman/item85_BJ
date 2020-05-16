@@ -1,5 +1,5 @@
 # TL; DR
-`./pokémon-go run hello.pokemongo
+`./pokémon-go run hello.pokemongo`
 
 # What is this?
 `pokemon-go` is a script which takes a file with a `.pokemongo` extension, translates it to Go, and then runs using whatever other arguments you passed it as though they were passed to the usual `go` command.
