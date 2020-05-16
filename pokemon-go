@@ -7,13 +7,29 @@ function substitute {
              emboar oshawott dewott samurott patrat
              watchog lillipup herdier stoutland purrloin
              liepard pansage simisage pansear simisear
-             panpour simipour munna musharna victini"
+             panpour simipour munna musharna victini
+             pidove tranquill unfezant blitzle zebstrika
+             roggenrola boldore gigalith woobat swoobat
+             drilbur excadrill audino timburr conkeldurr
+             tympole palpitoad seismitoad throh sawk
+             sewaddle swadloon leavanny venipede whirlipede
+             scolipede cottonee whimsicott petilil lilligant
+             basculin sandile krokorok krookodile darumaka
+             darmanitan maractus dwebble crustle"
 
     keywords=("break" case chan const "continue"
               default defer else fallthrough for 
               func go goto if import 
               interface map package range "return" 
-              select struct switch "type" var)
+              select struct switch "type" var
+              bool byte complex64 complex128 error
+              float32 float64 int int8 int16
+              int32 int64 rune string uint
+              uint8 uint16 uint32 uint64 uintptr
+              "true" "false" iota nil append
+              cap close complex copy delete
+              imag len make new panic
+              "print" "println" real recover)
 
     count=0
     cat $1 >> $2
