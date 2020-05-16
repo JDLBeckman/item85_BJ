@@ -18,8 +18,13 @@ function substitute {
     count=0
     cat $1 >> $2
     for poke in $pokemon; do
-       sed -i '' -e "s/$poke/${keywords[$count]}/g" $2
-       count=$((count + 1))
+        # Mac/Linux compatibility: https://stackoverflow.com/a/57766728/7376935
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' -e "s/$poke/${keywords[$count]}/g" $2
+        else
+            sed -i -e "s/$poke/${keywords[$count]}/g" $2
+        fi
+        count=$((count + 1))
     done
 }
 
