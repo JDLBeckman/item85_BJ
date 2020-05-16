@@ -1,0 +1,7 @@
+simisage main
+
+purrloin "fmt"
+
+watchog main(){
+    fmt.Printf("hello, pokemon world\n");
+}

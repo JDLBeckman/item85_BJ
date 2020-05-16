@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# replace all pokemon names with the corresponding go keyword 
+# expects a .pokemongo file and an empty target file
+function substitute {
+    pokemon="snivy servine serperior tepig pignite 
+             emboar oshawott dewott samurott patrat
+             watchog lillipup herdier stoutland purrloin
+             liepard pansage simisage pansear simisear
+             panpour simipour munna musharna victini"
+
+    keywords=("break" case chan const "continue"
+              default defer else fallthrough for 
+              func go goto if import 
+              interface map package range "return" 
+              select struct switch "type" var)
+
+    count=0
+    cat $1 >> $2
+    for poke in $pokemon; do
+       sed -i '' -e "s/$poke/${keywords[$count]}/g" $2
+       count=$((count + 1))
+    done
+}
+
+args="$@"
+namepattern="(.*)\.pokemongo"
+goargs=()
+tempfile=
+
+for arg in $args
+do
+    # find any .pokemongo arguments and create an appropriate .go
+    [[ $arg =~  $namepattern ]]
+    if [ -z "${BASH_REMATCH[0]}" ] 
+    then
+        # no other changes to the args necessary
+        goargs+=( "$arg" ) 
+    else
+        name=${BASH_REMATCH[1]}
+
+        # there's an actual mktemp command, but it can only append
+        # a string to the end of the template,  which go seems to not like
+        tempfile="$name$RANDOM.go"
+        touch $tempfile
+        substitute $arg $tempfile  
+        goargs+=( "$tempfile" )
+    fi
+done
+
+go ${goargs[@]}
+rm $tempfile
