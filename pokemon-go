@@ -2,22 +2,24 @@
 
 # replace all pokemon names with the corresponding go keyword 
 # expects a .pokemongo file and an empty target file
+
+pokemon=("snivy" "servine" "serperior" "tepig" "pignite"
+         "emboar" "oshawott" "dewott" "samurott" "patrat"
+         "watchog" "lillipup" "herdier" "stoutland" "purrloin"
+         "liepard" "pansage" "simisage" "pansear" "simisear"
+         "panpour" "simipour" "munna" "musharna" "victini")
+
+keywords=("break" "case" "chan" "const" "continue"
+          "default" "defer" "else" "fallthrough" "for"
+          "func" "go" "goto" "if" "import"
+          "interface" "map" "package" "range" "return"
+          "select" "struct" "switch" "type" "var")
+
+
 function substitute {
-    pokemon="snivy servine serperior tepig pignite 
-             emboar oshawott dewott samurott patrat
-             watchog lillipup herdier stoutland purrloin
-             liepard pansage simisage pansear simisear
-             panpour simipour munna musharna victini"
-
-    keywords=("break" case chan const "continue"
-              default defer else fallthrough for 
-              func go goto if import 
-              interface map package range "return" 
-              select struct switch "type" var)
-
     count=0
     cat $1 >> $2
-    for poke in $pokemon; do
+    for poke in "${pokemon[@]}"; do
         # Mac/Linux compatibility: https://stackoverflow.com/a/57766728/7376935
         if [[ "$OSTYPE" == "darwin"* ]]; then
             sed -i '' -e "s/$poke/${keywords[$count]}/g" $2
@@ -25,6 +27,28 @@ function substitute {
             sed -i -e "s/$poke/${keywords[$count]}/g" $2
         fi
         count=$((count + 1))
+    done
+}
+
+function remove_go_keywords {
+    # for each keyword, add enough underscores to the front such that that string is no longer found in the file
+    # e.g. if user has variables named "if" and "_if" for some reason, then it will turn the former into "__if"
+    cat $1 >> $2
+    for kw in "${keywords[@]}"; do
+        # echo "current kw: "$kw
+        new_str=$kw;
+        while grep -q $new_str $2; do
+            # echo $new_str" in file"
+            new_str="_"$new_str
+        done
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' -e "s/$kw/$new_str/g" $2
+        else
+            sed -i -e "s/$kw/$new_str/g" $2
+        fi
+        # echo "done with kw: "$kw
+        # echo "continue?"
+        # read
     done
 }
 
@@ -47,11 +71,23 @@ do
         # there's an actual mktemp command, but it can only append
         # a string to the end of the template,  which go seems to not like
         tempfile="$name$RANDOM.go"
+        tempfile2="$name$RANDOM$RANDOM.go"
         touch $tempfile
-        substitute $arg $tempfile  
-        goargs+=( "$tempfile" )
+        touch $tempfile2
+        remove_go_keywords $arg $tempfile
+        # echo "\ndebug; here is tempfile:"
+        # cat $tempfile
+        # echo "/debug\n"
+        
+        substitute $tempfile $tempfile2
+        # echo "\ndebug; here is tempfile2:"
+        # cat $tempfile2
+        # echo "/debug\n"
+
+        goargs+=( "$tempfile2" )
     fi
 done
 
 go ${goargs[@]}
 rm $tempfile
+rm $tempfile2

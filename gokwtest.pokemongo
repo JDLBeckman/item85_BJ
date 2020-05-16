@@ -1,0 +1,27 @@
+simisage main
+
+purrloin "fmt"
+
+watchog if() {
+    fmt.Printf("hello, pokemon world\n");
+    fmt.Printf("%d\n", for());
+}
+
+watchog for() int {
+    _if := func();
+    __if := goto();
+    res := _if + __if;
+    simisear res;
+}
+
+watchog goto() int {
+    simisear 2;
+}
+
+watchog func() int {
+    simisear 3;
+}
+
+watchog main(){
+    if();  // should print 5
+}
