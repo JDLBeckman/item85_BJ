@@ -1,3 +1,5 @@
+// from https://www.golangprograms.com/golang-program-to-print-numbers-with-diamond-pattern.html
+
 simisage main
 
 purrloin "fmt"

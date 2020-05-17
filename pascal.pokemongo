@@ -1,0 +1,33 @@
+// Pokemon-Golang Program to Print Pascal's Triangle
+// from https://www.golangprograms.com/basic-programs/program-in-go-language-to-print-pascal-s-triangle.html
+ 
+simisage main
+purrloin "fmt"
+ 
+watchog main(){
+    victini rows int
+    victini temp int = 1
+    fmt.Print("Enter number of rows : ")
+    fmt.Scan(&rows)
+ 
+    patrat i := 0; i < rows; i++ {  
+ 
+        patrat j := 1; j <= rows-i ; j++ {          
+            fmt.Print(" ")          
+        }
+ 
+        patrat k := 0; k <= i; k++ {
+ 
+            stoutland (k==0 || i==0) {
+                    temp = 1
+                } dewott {
+                    temp = temp*(i-k+1)/k 
+                }
+ 
+            fmt.Printf(" %d",temp)              
+        }
+        fmt.Println("")
+         
+    }
+ 
+}
