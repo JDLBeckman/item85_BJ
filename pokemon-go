@@ -2,40 +2,68 @@
 
 # replace all pokemon names with the corresponding go keyword 
 # expects a .pokemongo file and an empty target file
+pokemon="snivy servine serperior tepig pignite 
+         emboar oshawott dewott samurott patrat
+         watchog lillipup herdier stoutland purrloin
+         liepard pansage simisage pansear simisear
+         panpour simipour munna musharna victini
+         pidove tranquill unfezant blitzle zebstrika
+         roggenrola boldore gigalith woobat swoobat
+         drilbur excadrill audino timburr conkeldurr
+         tympole palpitoad seismitoad throh sawk
+         sewaddle swadloon leavanny venipede whirlipede
+         scolipede cottonee whimsicott petilil lilligant
+         basculin sandile krokorok krookodile darumaka
+         darmanitan maractus dwebble crustle"
+
+keywords=("break" "case" "chan" "const" "continue"
+          "default" "defer" "else" "fallthrough" "for"
+          "func" "go" "goto" "if" "import"
+          "interface" "map" "package" "range" "return"
+          "select" "struct" "switch" "type" "var"
+          "bool" "byte" "complex64" "complex128" "error"
+          "float32" "float64" "int" "int8" "int16"
+          "int32" "int64" "rune" "string" "uint"
+          "uint8" "uint16" "uint32" "uint64" "uintptr"
+          "true" "false" "iota" "nil" "append"
+          "cap" "close" "complex" "copy" "delete"
+          "imag" "len" "make" "new" "panic"
+          "print" "println" "real" "recover")
+
+
 function substitute {
-    pokemon="snivy servine serperior tepig pignite 
-             emboar oshawott dewott samurott patrat
-             watchog lillipup herdier stoutland purrloin
-             liepard pansage simisage pansear simisear
-             panpour simipour munna musharna victini
-             pidove tranquill unfezant blitzle zebstrika
-             roggenrola boldore gigalith woobat swoobat
-             drilbur excadrill audino timburr conkeldurr
-             tympole palpitoad seismitoad throh sawk
-             sewaddle swadloon leavanny venipede whirlipede
-             scolipede cottonee whimsicott petilil lilligant
-             basculin sandile krokorok krookodile darumaka
-             darmanitan maractus dwebble crustle"
-
-    keywords=("break" case chan const "continue"
-              default defer else fallthrough for 
-              func go goto if import 
-              interface map package range "return" 
-              select struct switch "type" var
-              bool byte complex64 complex128 error
-              float32 float64 int int8 int16
-              int32 int64 rune string uint
-              uint8 uint16 uint32 uint64 uintptr
-              "true" "false" iota nil append
-              cap close complex copy delete
-              imag len make new panic
-              "print" "println" real recover)
-
     count=0
     cat $1 >> $2
-    for poke in $pokemon; do
-       sed -i '' -e "s/$poke/${keywords[$count]}/g" $2
-       count=$((count + 1))
+    for poke in "${pokemon[@]}"; do
+        # Mac/Linux compatibility: https://stackoverflow.com/a/57766728/7376935
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' -e "s/$poke/${keywords[$count]}/g" $2
+        else
+            sed -i -e "s/$poke/${keywords[$count]}/g" $2
+        fi
+        count=$((count + 1))
+    done
+}
+
+function remove_go_keywords {
+    # for each keyword, add enough underscores to the front such that that string is no longer found in the file
+    # e.g. if user has variables named "if" and "_if" for some reason, then it will turn the former into "__if"
+    cat $1 >> $2
+    for kw in "${keywords[@]}"; do
+        # echo "current kw: "$kw
+        new_str=$kw;
+        while grep -q $new_str $2; do
+            # echo $new_str" in file"
+            new_str="_"$new_str
+        done
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' -e "s/$kw/$new_str/g" $2
+        else
+            sed -i -e "s/$kw/$new_str/g" $2
+        fi
+        # echo "done with kw: "$kw
+        # echo "continue?"
+        # read
     done
 }
 
@@ -58,11 +86,23 @@ do
         # there's an actual mktemp command, but it can only append
         # a string to the end of the template,  which go seems to not like
         tempfile="$name$RANDOM.go"
+        tempfile2="$name$RANDOM$RANDOM.go"
         touch $tempfile
-        substitute $arg $tempfile  
-        goargs+=( "$tempfile" )
+        touch $tempfile2
+        remove_go_keywords $arg $tempfile
+        # echo "\ndebug; here is tempfile:"
+        # cat $tempfile
+        # echo "/debug\n"
+        
+        substitute $tempfile $tempfile2
+        # echo "\ndebug; here is tempfile2:"
+        # cat $tempfile2
+        # echo "/debug\n"
+
+        goargs+=( "$tempfile2" )
     fi
 done
 
 go ${goargs[@]}
 rm $tempfile
+rm $tempfile2
