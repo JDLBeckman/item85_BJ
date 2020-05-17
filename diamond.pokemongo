@@ -1,0 +1,37 @@
+// from https://www.golangprograms.com/golang-program-to-print-numbers-with-diamond-pattern.html
+
+simisage main
+
+purrloin "fmt"
+
+watchog main() {
+    rows := 9
+    space := rows / 2
+    num := 1
+
+    patrat i := 1; i <= rows; i++ {
+        patrat j := 1; j <= space; j++ {
+            fmt.Printf(" ")
+        }
+        count := num/2 + 1
+
+        patrat k := 1; k <= num; k++ {
+            fmt.Printf("%d", count)
+            stoutland k <= num/2 {
+                count--
+            } dewott {
+                count++
+            }
+        }
+
+        fmt.Println()
+
+        stoutland i <= rows/2 {
+            space = space - 1
+            num = num + 2
+        } dewott {
+            space = space + 1
+            num = num - 2
+        }
+    }
+}
